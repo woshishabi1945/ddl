@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>游戏</title>
+    <link href="https://fonts.googleapis.com/css?family=Poppins:400,500,600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: #000;
+            color: #fff;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            padding: 20px;
+        }
+
+    .game-card {
+            background-color: #111;
+            border-radius: 20px;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
+            padding: 20px;
+            width: 100%;
+            max-width: 350px;
+        }
+
+        #health,
+        #timer,
+        #input-display {
+            font-size: 16px;
+            margin: 8px 0;
+            font-weight: 500;
+        }
+
+        #phone-number {
+            font-size: 24px;
+            margin: 12px 0;
+            color: #00ff7f;
+            font-weight: 600;
+        }
+
+    .number-button {
+            width: 50px;
+            height: 50px;
+            margin: 8px;
+            font-size: 18px;
+            cursor: pointer;
+            background: linear-gradient(135deg, #ff4500, #ff8c00);
+            border: none;
+            border-radius: 50%;
+            color: white;
+            box-shadow: 0 5px 10px rgba(0, 0, 0, 0.3);
+            transition: background 0.3s ease, transform 0.2s ease;
+        }
+
+    .number-button:hover {
+            background: linear-gradient(135deg, #ff8c00, #ff4500);
+            transform: scale(1.1);
+        }
+
+    .number-button:active {
+            transform: scale(1);
+        }
+
+        #buttons-container {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            margin-top: 15px;
+        }
+
+        #action-buttons {
+            margin-top: 15px;
+        }
+
+        #action-buttons button {
+            padding: 10px 20px;
+            font-size: 16px;
+            background-color: #28a745;
+            color: white;
+            border: none;
+            border-radius: 12px;
+            margin: 6px;
+            cursor: pointer;
+            transition: background 0.3s ease;
+        }
+
+        #action-buttons button:hover {
+            background-color: #218838;
+        }
+
+        #action-buttons button:active {
+            background-color: #1e7e34;
+        }
+
+        #input-display {
+            font-size: 20px;
+            color: #ccc;
+        }
+
+        #timer,
+        #health {
+            color: #ff0000;
+        }
+
+        /* 动画效果 */
+    .fade-in {
+            animation: fadeIn 1s ease;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+
+            to {
+                opacity: 1;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="game-card fade-in">
+        <div id="health">生命值: <span id="health-value">3</span></div>
+        <div id="phone-number">电话号码显示中...</div>
+        <div id="timer">剩余时间: <span id="timer-value">30</span> 秒</div>
+        <div id="input-display">输入的号码: <span id="input-value"></span></div>
+
+        <div id="buttons-container">
+            <button class="number-button" onclick="appendNumber(1)"><i class="fas fa-keyboard"></i>1</button>
+            <button class="number-button" onclick="appendNumber(2)"><i class="fas fa-keyboard"></i>2</button>
+            <button class="number-button" onclick="appendNumber(3)"><i class="fas fa-keyboard"></i>3</button>
+            <button class="number-button" onclick="appendNumber(4)"><i class="fas fa-keyboard"></i>4</button>
+            <button class="number-button" onclick="appendNumber(5)"><i class="fas fa-keyboard"></i>5</button>
+            <button class="number-button" onclick="appendNumber(6)"><i class="fas fa-keyboard"></i>6</button>
+            <button class="number-button" onclick="appendNumber(7)"><i class="fas fa-keyboard"></i>7</button>
+            <button class="number-button" onclick="appendNumber(8)"><i class="fas fa-keyboard"></i>8</button>
+            <button class="number-button" onclick="appendNumber(9)"><i class="fas fa-keyboard"></i>9</button>
+            <button class="number-button" onclick="appendNumber(0)"><i class="fas fa-keyboard"></i>0</button>
+        </div>
+
+        <div id="action-buttons">
+            <button onclick="checkAnswer()">提交答案 <i class="fas fa-check"></i></button>
+            <button onclick="deleteLastDigit()">删除最后一位 <i class="fas fa-backspace"></i></button>
+            <button onclick="resetGame()">重新开始 <i class="fas fa-sync-alt"></i></button>
+        </div>
+
+        <audio id="successSound1" src="音频1.mp3"></audio>
+        <audio id="successSound2" src="音频2.mp3"></audio>
+        <audio id="failureSound" src="失败音效.mp3"></audio>
+    </div>
+
+    <script>
+        let health = 3;
+        let correctPhoneNumber = '';
+        let timer = 30;
+        let gameTimer;
+        let userInput = '';
+        let numberDisplayTimer;
+
+        // 随机生成电话号码
+        function generatePhoneNumber() {
+            let phoneNumber = '';
+            for (let i = 0; i < 4; i++) {
+                phoneNumber += Math.floor(Math.random() * 10);
+            }
+            return phoneNumber;
+        }
+
+        // 显示电话号码
+        function showPhoneNumber() {
+            correctPhoneNumber = generatePhoneNumber();
+            document.getElementById('phone-number').innerText = '电话号码: ' + correctPhoneNumber;
+            document.getElementById('phone-number').style.display = 'block';
+
+            // 3秒后电话号码消失并开始计时
+            clearTimeout(numberDisplayTimer);
+            numberDisplayTimer = setTimeout(() => {
+                document.getElementById('phone-number').style.display = 'none';
+                startTimer();
+            }, 3000);
+        }
+
+        // 启动倒计时
+        function startTimer() {
+            // 清除已有的计时器以防止冲突
+            clearInterval(gameTimer);
+            timer = 30; // 重置计时器
+            document.getElementById('timer-value').innerText = timer;
+
+            gameTimer = setInterval(() => {
+                timer -= 1;
+                document.getElementById('timer-value').innerText = timer;
+
+                if (timer <= 0) {
+                    clearInterval(gameTimer);
+                    alert('时间到！游戏结束');
+                    resetGame();
+                }
+            }, 1000);
+        }
+
+        // 添加数字到输入
+        function appendNumber(number) {
+            userInput += number;
+            document.getElementById('input-value').innerText = userInput;
+        }
+
+        // 删除最后一位数字
+        function deleteLastDigit() {
+            userInput = userInput.slice(0, -1); // 删除最后一个字符
+            document.getElementById('input-value').innerText = userInput;
+        }
+
+        // 检查答案
+        function checkAnswer() {
+            if (userInput === correctPhoneNumber) {
+                const randomSuccessSound = Math.random() < 0.5? document.getElementById('successSound1') : document.getElementById('successSound2');
+                randomSuccessSound.play();
+                alert('打电话成功！');
+                resetGame();
+            } else {
+                document.getElementById('failureSound').play();
+                health -= 1;
+                document.getElementById('health-value').innerText = health;
+                if (health <= 0) {
+                    clearInterval(gameTimer);
+                    alert('你死了！游戏结束');
+                    resetGame();
+                } else {
+                    alert('号码错误，生命值减少！');
+                }
+            }
+
+            userInput = ''; // 清空输入框
+            document.getElementById('input-value').innerText = '';
+        }
+
+        // 重置游戏
+        function resetGame() {
+            health = 3;
+            timer = 30;
+            document.getElementById('health-value').innerText = health;
+            document.getElementById('timer-value').innerText = 30;
+            userInput = ''; // 清空用户输入
+            document.getElementById('input-value').innerText = '';
+            showPhoneNumber(); // 重新生成号码
+        }
+
+        // 初始化游戏
+        resetGame();
+    </script>
+</body>
+
+</html>
