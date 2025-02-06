@@ -21,7 +21,7 @@
             padding: 20px;
         }
 
-     .game-card {
+    .game-card {
             background-color: #111;
             border-radius: 20px;
             box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
@@ -45,7 +45,7 @@
             font-weight: 600;
         }
 
-     .number-button {
+    .number-button {
             width: 50px;
             height: 50px;
             margin: 8px;
@@ -59,12 +59,12 @@
             transition: background 0.3s ease, transform 0.2s ease;
         }
 
-     .number-button:hover {
+    .number-button:hover {
             background: linear-gradient(135deg, #ff8c00, #ff4500);
             transform: scale(1.1);
         }
 
-     .number-button:active {
+    .number-button:active {
             transform: scale(1);
         }
 
@@ -110,7 +110,7 @@
         }
 
         /* 动画效果 */
-     .fade-in {
+    .fade-in {
             animation: fadeIn 1s ease;
         }
 
@@ -124,7 +124,6 @@
             }
         }
     </style>
-    <!-- 确保音频路径正确 -->
     <audio id="digitSound" src="滴.mp3"></audio>
 </head>
 
@@ -158,6 +157,8 @@
         <audio id="successSound2" src="音频2.mp3"></audio>
         <audio id="failureSound" src="失败音效.mp3"></audio>
         <audio id="restartSound" src="重新开始.mp3"></audio>
+        <!-- 新增删除音效的audio元素 -->
+        <audio id="deleteSound" src="删除.mp3"></audio>
     </div>
 
     <script>
@@ -215,13 +216,16 @@
             userInput += number;
             document.getElementById('input-value').innerText = userInput;
             const digitSound = document.getElementById('digitSound');
-            // 重置音频播放位置到开始
             digitSound.currentTime = 0;
             digitSound.play();
         }
 
         // 删除最后一位数字
         function deleteLastDigit() {
+            const deleteSound = document.getElementById('deleteSound');
+            deleteSound.currentTime = 0;
+            deleteSound.play();
+
             userInput = userInput.slice(0, -1); // 删除最后一个字符
             document.getElementById('input-value').innerText = userInput;
         }
