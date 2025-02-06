@@ -21,7 +21,7 @@
             padding: 20px;
         }
 
-    .game-card {
+     .game-card {
             background-color: #111;
             border-radius: 20px;
             box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
@@ -45,7 +45,7 @@
             font-weight: 600;
         }
 
-    .number-button {
+     .number-button {
             width: 50px;
             height: 50px;
             margin: 8px;
@@ -59,12 +59,12 @@
             transition: background 0.3s ease, transform 0.2s ease;
         }
 
-    .number-button:hover {
+     .number-button:hover {
             background: linear-gradient(135deg, #ff8c00, #ff4500);
             transform: scale(1.1);
         }
 
-    .number-button:active {
+     .number-button:active {
             transform: scale(1);
         }
 
@@ -110,7 +110,7 @@
         }
 
         /* 动画效果 */
-    .fade-in {
+     .fade-in {
             animation: fadeIn 1s ease;
         }
 
@@ -124,6 +124,8 @@
             }
         }
     </style>
+    <!-- 确保音频路径正确 -->
+    <audio id="digitSound" src="滴.mp3"></audio>
 </head>
 
 <body>
@@ -155,6 +157,7 @@
         <audio id="successSound1" src="音频1.mp3"></audio>
         <audio id="successSound2" src="音频2.mp3"></audio>
         <audio id="failureSound" src="失败音效.mp3"></audio>
+        <audio id="restartSound" src="重新开始.mp3"></audio>
     </div>
 
     <script>
@@ -211,6 +214,10 @@
         function appendNumber(number) {
             userInput += number;
             document.getElementById('input-value').innerText = userInput;
+            const digitSound = document.getElementById('digitSound');
+            // 重置音频播放位置到开始
+            digitSound.currentTime = 0;
+            digitSound.play();
         }
 
         // 删除最后一位数字
@@ -245,6 +252,10 @@
 
         // 重置游戏
         function resetGame() {
+            const restartSound = document.getElementById('restartSound');
+            restartSound.currentTime = 0;
+            restartSound.play();
+
             health = 3;
             timer = 30;
             document.getElementById('health-value').innerText = health;
